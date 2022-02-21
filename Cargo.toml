@@ -1,0 +1,14 @@
+[package]
+name = "cppvtbl"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cppvtbl-macros = {path = "./macros", optional = true}
+
+[workspace]
+members = ['macros']
+
+[features]
+default = ["macros"]
+macros = ["cppvtbl-macros"]
