@@ -4,14 +4,14 @@ version = 3
 
 [[package]]
 name = "cppvtbl"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "cppvtbl-macros",
 ]
 
 [[package]]
 name = "cppvtbl-macros"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "proc-macro2",
  "quote",

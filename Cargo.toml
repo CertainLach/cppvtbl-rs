@@ -1,12 +1,12 @@
 [package]
 name = "cppvtbl"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 description = "C++ ABI ffi compatible vtables"
 license = "MIT"
 
 [dependencies]
-cppvtbl-macros = {version = "0.1.0", path = "./macros", optional = true}
+cppvtbl-macros = {version = "0.1.2", path = "./macros", optional = true}
 
 [workspace]
 members = ['macros']

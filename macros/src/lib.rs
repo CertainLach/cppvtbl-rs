@@ -74,7 +74,7 @@ pub fn vtable(attr: TokenStreamRaw, item: TokenStreamRaw) -> TokenStreamRaw {
 		let inputs = sig.inputs.iter().skip(1);
 		let output = &sig.output;
 		quote! {
-			#name: unsafe extern "C" fn(#this, #(#inputs,)*) #output
+			pub #name: unsafe extern "C" fn(#this, #(#inputs,)*) #output
 		}
 	});
 	let macro_vtable_fields = methods.iter().map(|(r, sig)| {

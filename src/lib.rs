@@ -70,15 +70,17 @@ impl<V: 'static> VtableRef<V> {
 	pub fn into_raw(v: &Self) -> *const c_void {
 		v as *const _ as *const c_void
 	}
-	pub fn into_raw_mut(v: &mut Self) -> *mut c_void {
-		v as *mut _ as *mut c_void
+	pub fn into_raw_mut(v: Pin<&mut Self>) -> *mut c_void {
+		// Safety: we returning pinned value as raw pointer,
+		// it is impossible to move data without using unsafe
+		unsafe { Pin::get_unchecked_mut(v) as *mut _ as *mut c_void }
 	}
 	/// Safety: lifetime should be correctly specified
 	pub unsafe fn from_raw<'r>(raw: *const c_void) -> &'r Self {
 		mem::transmute(raw as *const _ as *const Self)
 	}
 	/// Safety: lifetime should be correctly specified
-	pub unsafe fn from_raw_mut<'r>(raw: *mut c_void) -> &'r mut Self {
+	pub unsafe fn from_raw_mut<'r>(raw: *mut c_void) -> Pin<&'r mut Self> {
 		mem::transmute(raw as *mut _ as *mut Self)
 	}
 }
