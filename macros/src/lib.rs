@@ -225,6 +225,8 @@ pub fn impl_vtables(attr: TokenStreamRaw, item: TokenStreamRaw) -> TokenStreamRa
 	let input = parse_macro_input!(attr as VtablesInput);
 	let this = parse_macro_input!(item as ItemStruct);
 
+	let (impl_generics, ty_generics, where_clause) = this.generics.split_for_impl();
+
 	let this_name = &this.ident;
 
 	let impl_macro_calls = input.tables.iter().enumerate().map(|(i, name)| {
@@ -251,7 +253,7 @@ pub fn impl_vtables(attr: TokenStreamRaw, item: TokenStreamRaw) -> TokenStreamRa
 		let vtable_name = format_ident!("{}Vtable", name);
 		let index = Index::from(i);
 		quote! {
-			impl ::cppvtbl::HasVtable<#vtable_name> for #this_name {
+			impl #impl_generics ::cppvtbl::HasVtable<#vtable_name> for #this_name #ty_generics #where_clause {
 				fn get(from: &::cppvtbl::WithVtables<Self>) -> &::cppvtbl::VtableRef<#vtable_name> {
 					&from.vtables().#index
 				}
@@ -265,7 +267,7 @@ pub fn impl_vtables(attr: TokenStreamRaw, item: TokenStreamRaw) -> TokenStreamRa
 	(quote! {
 		#this
 		#(#impl_macro_calls;)*
-		unsafe impl ::cppvtbl::HasVtables for #this_name {
+		unsafe impl #impl_generics ::cppvtbl::HasVtables for #this_name #ty_generics #where_clause {
 			type Tables = (#(#type_tables,)*);
 			const TABLES: Self::Tables = (#(#impl_tables,)*);
 		}
