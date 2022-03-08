@@ -50,6 +50,9 @@ impl<T: HasVtables> DerefMut for WithVtables<T> {
 	}
 }
 
+/// # Safety
+///
+/// This should only be implemented if the type is guaranteed to have a vtable.
 pub unsafe trait HasVtables {
 	type Tables;
 	const TABLES: Self::Tables;
@@ -58,8 +61,10 @@ pub unsafe trait HasVtables {
 #[repr(transparent)]
 pub struct VtableRef<V: 'static>(&'static V, PhantomPinned);
 impl<V: 'static> VtableRef<V> {
-	/// Safety: constructed vtable should only be used by reference,
-	/// inside of WithVtables wrapper
+	/// # Safety
+	///
+	/// Constructed vtable should only be used by reference,
+	/// inside of [`WithVtables`] wrapper
 	pub const unsafe fn new(vtable: &'static V) -> Self {
 		Self(vtable, PhantomPinned)
 	}
@@ -74,13 +79,25 @@ impl<V: 'static> VtableRef<V> {
 		// it is impossible to move data without using unsafe
 		unsafe { Pin::get_unchecked_mut(v) as *mut _ }
 	}
-	/// Safety: lifetime should be correctly specified
+	/// # Safety
+	///
+	/// Lifetime should be correctly specified
 	pub unsafe fn from_raw<'r>(raw: *const VtableRef<V>) -> &'r Self {
-		mem::transmute(raw as *const _ as *const Self)
+		let raw = raw as *const Self;
+		#[allow(unused_unsafe)]
+		unsafe {
+			&*raw
+		}
 	}
-	/// Safety: lifetime should be correctly specified
+	/// # Safety
+	///
+	/// Lifetime should be correctly specified
 	pub unsafe fn from_raw_mut<'r>(raw: *mut VtableRef<V>) -> Pin<&'r mut Self> {
-		mem::transmute(raw as *mut _ as *mut Self)
+		let raw = raw as *mut _ as *mut Self;
+		#[allow(unused_unsafe)]
+		unsafe {
+			mem::transmute(raw)
+		}
 	}
 }
 
